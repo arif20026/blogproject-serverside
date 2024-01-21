@@ -60,15 +60,37 @@ async function run() {
             const id = req.params.id;
             const query = { _id: new ObjectId(id) }
             console.log(query)
-            const options = {
-                // Include only the `title` and `imdb` fields in the returned document
-                projection: { title: 1,  image: 1 ,longDescription: 1},
-            };
+            // const options = {
+            //     // Include only the `title` and `imdb` fields in the returned document
+            //     projection: { title: 1,  image: 1 ,longDescription: 1},
+            // };
 
-            const result = await blogCollection.findOne(query,options);
+            const result = await blogCollection.findOne(query);
             console.log(result)
             res.send(result);
         })
+
+        app.put('/blogs/:id', async (req, res) => {
+            const id = req.params.id
+            const filter = { _id: new ObjectId(id) }
+            const options = { upsert: true }
+            const updatedBlog = req.body
+      
+            const blog = {
+              $set: {
+                image: updatedBlog.updatedImage,
+                title: updatedBlog.updatedTitle,
+                category: updatedBlog.updatedCategory,
+                shortDescription: updatedBlog.updatedShortDescription,
+                longDescription: updatedBlog.updatedLongDescription,
+      
+              }
+            }
+      
+            const result = await blogCollection.updateOne(filter, blog, options)
+            res.send(result)
+          })
+      
 
         app.post('/wishList', async (req, res) => {
             const wishListedBlog = req.body;
@@ -113,6 +135,7 @@ async function run() {
             res.send(result);
         })
 
+   
 
 
 
