@@ -7,14 +7,15 @@ const port = process.env.PORT || 5000;
 
 
 // middleware
-app.use(cors({
-    origin: [
-        'http://localhost:5173',
-        // 'https://cars-doctor-6c129.web.app',
-        // 'https://cars-doctor-6c129.firebaseapp.com'
-    ],
-    credentials: true
-}));
+app.use(cors(
+//     {
+//     origin: [
+//         'http://localhost:5173',
+       
+//     ],
+//     credentials: true
+// }
+));
 app.use(express.json());
 
 
@@ -38,6 +39,7 @@ async function run() {
         // Connect the client to the server	(optional starting in v4.7)
         await client.connect();
         const blogCollection = client.db('blogUser').collection('blogs');
+        const wishListCollection = client.db('blogUser').collection('wishList');
 
 
         app.post('/blogs', async (req, res) => {
@@ -57,14 +59,60 @@ async function run() {
         app.get('/blogs/:id', async (req, res) => {
             const id = req.params.id;
             const query = { _id: new ObjectId(id) }
+            console.log(query)
             const options = {
                 // Include only the `title` and `imdb` fields in the returned document
-                projection: { title: 1,  image: 1 },
+                projection: { title: 1,  image: 1 ,longDescription: 1},
             };
 
             const result = await blogCollection.findOne(query,options);
+            console.log(result)
             res.send(result);
         })
+
+        app.post('/wishList', async (req, res) => {
+            const wishListedBlog = req.body;
+            console.log(wishListedBlog);
+            const result = await wishListCollection.insertOne(wishListedBlog);
+            res.send(result);
+        });
+
+        app.get('/wishList', async (req, res) => {
+
+            console.log(req.query.email)
+            let query = {}
+            if(req.query?.email){
+                query = {email : req.query.email}
+            }
+            const cursor = wishListCollection.find(query);
+            const result = await cursor.toArray();
+            res.send(result);
+        })
+
+
+        // app.get('/wishList/:id', async (req, res) => {
+            
+        //         const id = req.params.id;
+        //         const query = { _id: new ObjectId(id) }
+        //         console.log(query)
+        //         const options = {
+        //             projection: { title: 1, image: 1 },
+        //         };
+        
+        //         const result = await wishListCollection.findOne(query,options);
+                
+        //         console.log(result)
+        
+        // });
+        
+
+        app.delete('/wishList/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: new ObjectId(id) }
+            const result = await wishListCollection.deleteOne(query);
+            res.send(result);
+        })
+
 
 
 
