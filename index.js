@@ -40,6 +40,7 @@ async function run() {
         await client.connect();
         const blogCollection = client.db('blogUser').collection('blogs');
         const wishListCollection = client.db('blogUser').collection('wishList');
+        const commentCollection = client.db('blogUser').collection('comments');
 
 
         app.post('/blogs', async (req, res) => {
@@ -134,6 +135,40 @@ async function run() {
             const result = await wishListCollection.deleteOne(query);
             res.send(result);
         })
+
+
+        app.post('/comments', async (req, res) => {
+            const comment = req.body;
+            console.log(comment);
+            const result = await commentCollection.insertOne(comment);
+            res.send(result);
+        });
+
+        app.get('/comments', async (req, res) => {
+            
+            let query = {};
+            if (req.query?.blogId) {
+                query = { blogId: req.query.blogId };
+            }
+            const cursor = commentCollection.find(query)
+            const result = await cursor.toArray();
+            res.send(result);
+        });
+            
+
+        // app.get('/comments/:id', async (req, res) => {
+        //     const id = req.params.id;
+        //     const query = { _id: new ObjectId(id) }
+        //     console.log(query)
+        //     // const options = {
+        //     //     // Include only the `title` and `imdb` fields in the returned document
+        //     //     projection: { title: 1,  image: 1 ,longDescription: 1},
+        //     // };
+
+        //     const result = await commentCollection.findOne(query);
+        //     console.log(result)
+        //     res.send(result);
+        // })
 
    
 
