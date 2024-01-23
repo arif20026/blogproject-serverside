@@ -44,6 +44,8 @@ const logger = (req, res, next) =>{
     next();
 }
 
+
+
 const verifyToken = (req, res, next) =>{
     const token = req?.cookies?.token;
     // console.log('token in the middleware', token);
