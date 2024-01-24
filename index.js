@@ -13,8 +13,10 @@ app.use(cors(
     {
     origin: [
         
-        'http://localhost:5173',
-       
+        // 'http://localhost:5173
+
+        'https://assignment-11-blog-client.web.app',
+        'https://assignment-11-blog-client.firebaseapp.com'
     ],
     credentials: true
 }
@@ -163,17 +165,27 @@ async function run() {
             res.send(result);
         })
 
+        app.get('/wishList', logger, verifyToken, async (req, res) => {
+            const { id } = req.query;
+            let query = {};
+        
+            if (id) {
+                query = { _id: new ObjectId(id) };
+            }
+        
+            const cursor = wishListCollection.find(query);
+            const result = await cursor.toArray();
+            res.send(result);
+        });
+        
+
 
         // app.get('/wishList/:id', async (req, res) => {
             
         //         const id = req.params.id;
         //         const query = { _id: new ObjectId(id) }
         //         console.log(query)
-        //         const options = {
-        //             projection: { title: 1, image: 1 },
-        //         };
-        
-        //         const result = await wishListCollection.findOne(query,options);
+        //         const result = await wishListCollection.findOne(query);
                 
         //         console.log(result)
         
